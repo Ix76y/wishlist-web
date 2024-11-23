@@ -19,7 +19,7 @@ async function getWishlists(token) {
 export async function load({ cookies }) {
 	let token = cookies.get('token');
 	console.log(`Server Main: Token from Cookies ${token}`);
-	if (!token) {
+	if (!token || token == null) {
 		redirect(307, '/login');
 	}
     let data = await getWishlists(token);
@@ -146,6 +146,40 @@ export const actions = {
 		var r = null;
         console.log(`Server: Adding user to shared list.`);
         const response = await fetch(`https://wishlist-api-sage.vercel.app/lists/${listId}/user`, requestOptions) // https://wishlist-api-sage.vercel.app/token
+            .then((response) => response.json())
+            .then((result) => r = result)
+            .catch((err) => {console.error(err); return { success: false, error: err } });
+    
+        console.log(`Data from API: ${JSON.stringify(r)}`);
+        
+        return {success: true}
+	},
+
+    approveUser: async ({ cookies, request }) => {
+        let token = cookies.get('token');
+        console.log(`Server Main: Token from Cookies ${token}`);
+        if (!token) {
+            redirect(307, '/user/login');
+        }
+
+        const data = await request.formData();
+		const listId = data.get('listId');
+		const userId = data.get('userId');
+
+        const headers = new Headers();
+        headers.append("Access-Control-Allow-Origin", "https://wishlist-api-sage.vercel.app");
+        headers.append("Authorization", "Bearer " + token);
+    
+        const requestOptions = {
+            method: "PATCH",
+            headers: headers,
+            redirect: "follow"
+        };
+    
+
+		var r = null;
+        console.log(`Server: Approving user to list.`);
+        const response = await fetch(`https://wishlist-api-sage.vercel.app/lists/${listId}/user/${userId}`, requestOptions) // https://wishlist-api-sage.vercel.app/token
             .then((response) => response.json())
             .then((result) => r = result)
             .catch((err) => {console.error(err); return { success: false, error: err } });

@@ -10,7 +10,7 @@
     // let login = $state(true);
 
 	//let token = $state();
-	let email = $state('iz@barracudabyte.com');
+	let email = $state('');
 	let password = $state('');
     let username = $state();
 
@@ -32,14 +32,14 @@
         <div class="space-y-4">
             <div>
                 <label for="email" class="block mb-2 text-sm">Email address</label>
-                <input type="email" name="email" id="email" value={email} placeholder="leroy@jenkins.com" class="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800">
+                <input type="email" name="email" id="email" value={email} placeholder="" class="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800">
             </div>
             <div>
                 <div class="flex justify-between mb-2">
                     <label for="password" class="text-sm">Password</label>
                     <a rel="noopener noreferrer" href="#" class="text-xs hover:underline dark:text-gray-600">Forgot password?</a>
                 </div>
-                <input type="password" name="password" id="password" bind:value={password} placeholder="*****" class="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800">
+                <input type="password" name="password" id="password" bind:value={password} placeholder="" class="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800">
             </div>
         </div>
         <div class="space-y-2">

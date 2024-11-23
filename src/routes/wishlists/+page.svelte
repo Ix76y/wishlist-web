@@ -49,10 +49,6 @@
         return result;
     }
 
-    function approveUser(userId, approve) {
-        // TODO: do something
-    }
-
     function getUserNameById(wishlist, reserved_by) {
         for(var user of wishlist.shared_users) {
             if (user.id == reserved_by) {
@@ -101,15 +97,18 @@
                         <div class="flex gap-2">
                             <p>🧍‍♂️ Shared with: </p>
                             {#each wishlist.shared_users as user }
-                            {#if user.approved }
-                                <p class="">{user.name}</p>
-                            {:else}
-                            <div class="flex text-amber-600 dark:text-amber-500">
-                                <p class="">{user.name}</p>
-                                <button class="text-lime-500" onclick={() => approveUser(user.id, true) }>✔</button>
-                                <button class="text-red-500" onclick={() => approveUser(user.id, false) }>ⅹ</button>
-                            </div>
-                        {/if}
+                                {#if user.approved }
+                                    <p class="">{user.name}</p>
+                                {:else}
+                                    <form method="POST" action="?/approveUser">
+                                        <div class="flex text-amber-600 dark:text-amber-500">
+                                            <p class="">{user.name} {user.id}</p>
+                                            <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
+                                            <input type="hidden" id="userId" name="userId" value={user.id}>
+                                            <button class="text-lime-500">✔</button>
+                                        </div>
+                                    </form>
+                                {/if}
                             {/each}
                         </div>
                     {/if}
@@ -373,7 +372,7 @@
                     deleteWish = false;
                 }
             }}>
-                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wish <b>{selectedWish.name}</b>? This can't be undone.</p>
+                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wish <b>{selectedWish.name} ({selectedWish.id})</b>? This can't be undone.</p>
                 <input type="hidden" id="wishId" name="wishId" value={selectedWish.id}>
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
                     <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 text-red-500 dark:text-red-400">Delete</button>

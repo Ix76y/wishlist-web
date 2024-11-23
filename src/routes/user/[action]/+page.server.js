@@ -71,7 +71,8 @@ export const actions = {
         return {success: true}
 	},
 
-    logoutUser: async ({ request }) => {
-        cookies.set('token', null, { path: '/' });
+    logoutUser: async ({ cookies, request }) => {
+        cookies.delete('token', { path: '/' });
+        redirect(303, '/');
 	}
 }
