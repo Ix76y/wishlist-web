@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { CREATE_KEY } from '$env/dynamic/private';
+import { CREATE_KEY } from '$env/static/private';
 
 export const actions = {
     loginUser: async ({ cookies, request }) => {
