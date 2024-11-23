@@ -169,7 +169,7 @@
     {/await}-->
     {/if}
 
-    {#if createList && selectedList }
+    {#if createList }
         <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md dark:bg-gray-50 dark:text-gray-800 mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
@@ -372,7 +372,7 @@
                     deleteWish = false;
                 }
             }}>
-                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wish <b>{selectedWish.name} ({selectedWish.id})</b>? This can't be undone.</p>
+                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wish <b>{selectedWish.name}</b>? This can't be undone.</p>
                 <input type="hidden" id="wishId" name="wishId" value={selectedWish.id}>
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
                     <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 text-red-500 dark:text-red-400">Delete</button>
