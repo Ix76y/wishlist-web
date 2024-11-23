@@ -1,5 +1,6 @@
 <script>
     import TextInput from "$lib/TextInput.svelte";
+    import CircularProgress from '$lib/CircularProgress.svelte';
 	import Wishlists from '$lib/Wishlists.svelte';
 
     import { page, navigating } from '$app/stores';
@@ -183,6 +184,7 @@
                 return async ({ update }) => {
                     await update();
                     createList = false;
+                    loading = false;
                 }
             }}>
                 <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Create a new wishlist. You can share it with others or just create one for yourself.</p>
@@ -190,7 +192,11 @@
                 <TextInput title="Description" id="description"></TextInput>
                 
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Create</button>
+                    {#if loading}
+                        <CircularProgress/>
+                    {:else}
+                        <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Create</button>
+                    {/if}
                 </div>
             </form>
             <div class="my-2 flex items-center gap-4 before:h-px before:flex-1 before:bg-gray-300  before:content-[''] after:h-px after:flex-1 after:bg-gray-300  after:content-['']">Or</div>
@@ -215,14 +221,19 @@
                 loading = true;
                 return async ({ update }) => {
                     await update();
-                    updazeList = false;
+                    updateList = false;
+                    loading = false;
                 }
             }}>
                 <TextInput title="Wishlist" id="wishlist" placeholder="" value={selectedList.name}></TextInput>
                 <TextInput title="Description" id="description" value={selectedList.description}></TextInput>
                 <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Update</button>
+                    {#if loading}
+                        <CircularProgress/>
+                    {:else}
+                        <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Update</button>
+                    {/if}
                 </div>
             </form>
         </div>
@@ -240,12 +251,17 @@
                 return async ({ update }) => {
                     await update();
                     deleteList = false;
+                    loading = false;
                 }
             }}>
                 <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wishlist <b>{selectedList.name}</b>? This can't be undone.</p>
                 <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 text-red-500 dark:text-red-400">Delete</button>
+                    {#if loading}
+                        <CircularProgress/>
+                    {:else}
+                        <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Delete</button>
+                    {/if}
                 </div>
             </form>
         </div>
@@ -282,6 +298,7 @@
                 return async ({ update }) => {
                     await update();
                     createWish = false;
+                    loading = false; 
                 }
             }}>
                 <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">You can create a new wish for yourself or someone else, the wish will be added to the "{selectedList.name}" list.</p>
@@ -297,7 +314,11 @@
                 <TextInput title="Description" id="wishdescription" disabled={loading}></TextInput>
                 <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">Create</button>
+                    {#if loading}
+                        <CircularProgress/>
+                    {:else}
+                        <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">Create</button>
+                    {/if}
                 </div>
             </form>
         </div>
@@ -314,6 +335,7 @@
                 return async ({ update }) => {
                     await update();
                     updateWish = false;
+                    loading = false;
                 }
             }}>
                 <TextInput title="Wish" id="wish" value={selectedWish.name} ></TextInput>
@@ -328,7 +350,11 @@
                 <TextInput title="Description" id="wishdescription" value={selectedWish.description}></TextInput>
                 <input type="hidden" id="wishId" name="wishId" value={selectedWish.id}>
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Update</button>
+                    {#if loading}
+                        <CircularProgress/>
+                    {:else}
+                        <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">Update</button>
+                    {/if}
                 </div>
             </form>
         </div>
@@ -346,13 +372,18 @@
                 return async ({ update }) => {
                     await update();
                     reserveWish = false;
+                    loading = false;
                 }
             }}>
                 <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Do you want to reserve the wish <b>{selectedWish.name}</b>? This will indicate to everyone else that you will get this wish.</p>
                 <input type="hidden" id="reserve" name="reserve" value=true>
                 <input type="hidden" id="wishId" name="wishId" value={selectedWish.id}>
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">I will get it!</button>
+                    {#if loading}
+                        <CircularProgress/>
+                    {:else}
+                        <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">I will get it!</button>
+                    {/if}
                 </div>
             </form>
         </div>
@@ -370,12 +401,17 @@
                 return async ({ update }) => {
                     await update();
                     deleteWish = false;
+                    loading = false;
                 }
             }}>
                 <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wish <b>{selectedWish.name}</b>? This can't be undone.</p>
                 <input type="hidden" id="wishId" name="wishId" value={selectedWish.id}>
                 <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 text-red-500 dark:text-red-400">Delete</button>
+                    {#if loading}
+                        <CircularProgress/>
+                    {:else}
+                        <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">Delete</button>
+                    {/if}
                 </div>
             </form>
         </div>

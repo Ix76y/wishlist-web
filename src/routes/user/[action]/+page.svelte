@@ -1,5 +1,6 @@
 <script>
     import TextInput from '$lib/TextInput.svelte';
+    import CircularProgress from '$lib/CircularProgress.svelte';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { page, navigating } from '$app/stores';
@@ -9,6 +10,7 @@
     let { data, form } = $props();
 
     let login = $state('');
+    let loading = $state(false);
 
 	//let token = $state();
 	let email = $state('');
@@ -16,6 +18,7 @@
     let username = $state();
 
     onMount(async () => {
+        loading = false;
         login = $page.params.action == 'login';
         if (form?.success) { 
             login = true;
@@ -31,23 +34,33 @@
             <h1 class="my-3 text-4xl font-bold">Sign in</h1>
             <p class="text-sm dark:text-gray-600">Sign in to access your account</p>
         </div>
-        <form novalidate="" method="POST" action="?/loginUser" use:enhance class="space-y-12">
+        <form novalidate="" method="POST" action="?/loginUser" class="space-y-12" use:enhance={() => {
+            loading = true;
+            return async ({ update }) => {
+                await update();
+                // loading = false;
+            }
+        }}>
             <div class="space-y-4">
                 <div>
                     <label for="email" class="block mb-2 text-sm">Email address</label>
-                    <input type="email" name="email" required id="email" value={email} placeholder="" class="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800">
+                    <input type="email" name="email" required id="email" disabled={loading} value={email} placeholder="" class="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800">
                 </div>
                 <div>
                     <div class="flex justify-between mb-2">
                         <label for="password" class="text-sm">Password</label>
                         <a rel="noopener noreferrer" href="#" class="text-xs hover:underline dark:text-gray-600">Forgot password?</a>
                     </div>
-                    <input type="password" name="password" required id="password" bind:value={password} placeholder="" class="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800">
+                    <input type="password" name="password" required id="password" disabled={loading} bind:value={password} placeholder="" class="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800">
                 </div>
             </div>
             <div class="space-y-2">
                 <div><!-- onclick={getToken} -->
-                    <button type="submit" class="w-full px-8 py-3 font-semibold rounded-md dark:bg-violet-600 dark:text-gray-50">Sign in</button>
+                    {#if loading}
+                        <CircularProgress/>
+                    {:else}
+                        <button type="submit" disabled={loading} class="w-full px-8 py-3 font-semibold rounded-md dark:bg-violet-600 dark:text-gray-50">Sign in</button>
+                    {/if}
                 </div>
             </div>
         </form>	
