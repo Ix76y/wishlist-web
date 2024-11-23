@@ -1,6 +1,5 @@
 <script>
-	import TextInput from '$lib/TextInput.svelte';
-
+    import TextInput from '$lib/TextInput.svelte';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { page, navigating } from '$app/stores';
