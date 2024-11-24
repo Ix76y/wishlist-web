@@ -159,10 +159,10 @@
         {/each}
                     
         {#if selectedList }
-            <div class="flex gap-2 justify-center mt-4">
-                <button onclick={() => shareList = true } >🔗 Share</button>
-                <button onclick={() => updateList = true } >📑 Update</button>
-                <button onclick={() => deleteList = true }>🗑️ Delete</button>
+            <div class="flex gap-4 justify-center mt-4">
+                <button class="hover:text-indigo-500" onclick={() => shareList = true } ><ion-icon name="share-social-outline"></ion-icon> Share</button>
+                <button class="hover:text-indigo-500" onclick={() => updateList = true } ><ion-icon name="create-outline"></ion-icon> Update</button>
+                <button class="hover:text-indigo-500" onclick={() => deleteList = true }><ion-icon name="trash-bin-outline"></ion-icon> Delete</button>
             </div>
         {/if}
 
@@ -311,8 +311,8 @@
                 }
             }}>
                 <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">You can create a new wish for yourself or someone else, the wish will be added to the "{selectedList.name}" list.</p>
-                <TextInput title="Wish" id="wish" placeholder="Book" disabled={loading}></TextInput>
-                <TextInput title="For" id="wishowner" disabled={loading}></TextInput>
+                <TextInput title="Wish" id="wish" disabled={loading}></TextInput>
+                <TextInput title="For" id="wishowner" disabled={loading} value={data.user.name}></TextInput>
                 <fieldset class="w-full space-y-1 text-slate-700 dark:text-slate-400">
                     <label for="price" class="block text-sm font-medium">Estimated price</label>
                     <div class="flex">
