@@ -2,27 +2,26 @@
     import TextInput from "$lib/TextInput.svelte";
     import CircularProgress from '$lib/CircularProgress.svelte';
 	import Wishlists from '$lib/Wishlists.svelte';
+	import CreateWish from "$lib/dialogs/CreateWish.svelte";
+	import ShareWishlist from "$lib/dialogs/ShareWishlist.svelte";
+	import UpdateWishlist from "$lib/dialogs/UpdateWishlist.svelte";
+	import DeleteWishlist from "$lib/dialogs/DeleteWishlist.svelte";
+	import UpdateWish from "$lib/dialogs/UpdateWish.svelte";
+	import ReserveWish from "$lib/dialogs/ReserveWish.svelte";
+	import DeleteWish from "$lib/dialogs/DeleteWish.svelte";
 
     import { page, navigating } from '$app/stores';
     import { goto } from '$app/navigation';
     import { enhance } from '$app/forms';
     import { fly, slide } from 'svelte/transition';
     import { onMount } from 'svelte';
+	import CreateWishlist from "../../lib/dialogs/CreateWishlist.svelte";
 
 	let { data, children, form } = $props();
 
-    let createList = $state(false);
-    let updateList = $state(false);
-    let deleteList = $state(false);
-    let shareList = $state(false);
-    let valueCopied = $state(false);
     var selectedList = $state(null);
-
-    let createWish = $state(false);
-    let updateWish = $state(false);
-    let deleteWish = $state(false);
-    let reserveWish = $state(false);
     let selectedWish = $state();
+
     var loading = $state(false);
 
     /*function updateSelected(wishlists) {
@@ -39,11 +38,6 @@
             }
         }
         return true;
-    }
-
-    function copyListId() {
-        navigator.clipboard.writeText(selectedList.uuid);
-        valueCopied = true;
     }
 
     function groupWishesByUser(wishes) {
@@ -94,7 +88,17 @@
                     <button onclick={() => {selectedList = wishlist; console.log(`Wishlist Active: ${wishlist.name}. ${JSON.stringify(wishlist)}`);}} class="text-lg text-gray-900 dark:text-gray-100 font-light flex items-center flex-shrink-0 px-5 py-2 border-b-4 border-gray-700 dark:border-gray-300">{wishlist.name}</button>
                 {/if}
             {/each}
-            <button type="button" onclick={() => createList = true }  class="px-6 py-2 mx-auto font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">+</button>
+            <!--<button type="button" onclick={() => createList = true }  class="px-6 py-2 mx-auto font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">+</button>-->
+            <!-- Create Wishlist -->
+            <button aria-label="Add Wishlist" class="px-6 py-2 mx-auto font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded" onclick={() => {createWishlistDialog.showModal();}}><ion-icon name="add-outline"></ion-icon></button>
+            <dialog id="createWishlistDialog" class="modal">
+                <div class="modal-box">
+                    <form method="dialog">
+                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    <CreateWishlist />
+                </div>
+            </dialog>
         </div>
 
         {#each data.wishlists as wishlist}
@@ -138,13 +142,22 @@
                 </div>
                 {#if isApproved()}
                     <div class="flex items-center w-full">
-                        <button type="button" onclick={() => createWish = true } class="px-6 py-2 mx-auto my-4 font-semibold text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded border-4 border-indigo-500 hover:border-indigo-600">Add Wish</button>
+                        <!--<button type="button" onclick={() => createWish = true } class="px-6 py-2 mx-auto my-4 font-semibold text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded border-4 border-indigo-500 hover:border-indigo-600">Add Wish</button>-->
+                        <button class="btn bg-indigo-500 text-white mx-auto my-4  hover:bg-indigo-600 hover:dark:bg-indigo-400" onclick={() => createWishDialog.showModal()}>Add Wish</button>
+                        <dialog id="createWishDialog" class="modal">
+                            <div class="modal-box">
+                                <form method="dialog">
+                                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                </form>
+                                <CreateWish username={data.user.name} listId={selectedList.uuid} listName={selectedList.name}/>
+                            </div>
+                        </dialog>
                     </div>
                 {/if}
             {/if}
             {#if selectedList && wishlist.uuid == selectedList.uuid}
                 {#if !isApproved()}
-                <p class="italic text-sm text-slate-700 dark:text-slate-400 font-light text-center w-full my-4">The owner of the wishlist first has to approve you, before you can see items.</p>
+                    <p class="italic text-sm text-slate-700 dark:text-slate-400 font-light text-center w-full my-4">The owner of the wishlist first has to approve you, before you can see items.</p>
                 {:else if wishlist.items.length == 0}
                     <p class="italic text-sm text-slate-700 dark:text-slate-400 font-light text-center w-full my-4">This wishlist is currently empty. Get started by adding a new wish to it!</p>
                 {:else}
@@ -164,15 +177,42 @@
                                             <p class="text-sm text-slate-700 dark:text-slate-400 font-light">{wish.description}</p>
                                         {/if}
                                         <div class="flex gap-2 mt-1">
-                                            <button onclick={() => {selectedWish = wish; updateWish = true; }} class="text-sm text-sky-500 font-light" >Update</button>
                                             {#if wish.recipient != data.user.name}
                                                 {#if !wish.reserved }
-                                                    <button onclick={() => {selectedWish = wish; reserveWish = true; }} class="text-sm text-indigo-500 font-light" >Reserve</button>
+                                                     <!-- Reserve Wish -->
+                                                    <button class="btn btn-outline btn-sm" onclick={() => {selectedWish = wish; reserveWishDialog.showModal();}}><ion-icon name="bookmark-outline"></ion-icon> Reserve</button>
+                                                    <dialog id="reserveWishDialog" class="modal">
+                                                        <div class="modal-box">
+                                                            <form method="dialog">
+                                                                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                            </form>
+                                                            <ReserveWish wishName={wish.name} wishId={wish.id} />
+                                                        </div>
+                                                    </dialog>
                                                 {:else }
-                                                    <p class="text-sm text-slate-700 dark:text-slate-400 font-light">Reserved by: {getUserNameById(wishlist, wish.reserved_by)}</p>
+                                                    <p class="text-sm text-slate-700 dark:text-slate-400 font-light pt-2">Reserved by: {getUserNameById(wishlist, wish.reserved_by)}</p>
                                                 {/if}
                                             {/if}
-                                            <button onclick={() => {selectedWish = wish; deleteWish = true; }} class="text-sm text-red-500 font-light" >Delete</button>
+                                            <!-- Update Wish -->
+                                            <button class="btn btn-outline btn-sm" onclick={() => {selectedWish = wish; updateWishDialog.showModal();}}><ion-icon name="create-outline"></ion-icon> Update</button>
+                                            <dialog id="updateWishDialog" class="modal">
+                                                <div class="modal-box">
+                                                    <form method="dialog">
+                                                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                    </form>
+                                                    <UpdateWish wishName={wish.name} wishId={wish.id} recipient={wish.recipient} price={wish.price} description={wish.description}/>
+                                                </div>
+                                            </dialog>
+                                            <!-- Delete Wish -->
+                                            <button class="btn btn-outline btn-sm btn-error" onclick={() => {selectedWish = wish; deleteWishDialog.showModal();}}><ion-icon name="trash-bin-outline"></ion-icon> Delete</button>
+                                            <dialog id="deleteWishDialog" class="modal">
+                                                <div class="modal-box">
+                                                    <form method="dialog">
+                                                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                    </form>
+                                                    <DeleteWish wishName={wish.name} wishId={wish.id} bind:selectedWish={selectedWish}/>
+                                                </div>
+                                            </dialog>
                                         </div>
                                     </div>
                                 {/each}
@@ -186,10 +226,39 @@
 
         {#if selectedList && isApproved() }
             <div class="flex gap-4 justify-center mt-4">
-                <button class="hover:text-indigo-500" onclick={() => shareList = true } ><ion-icon name="share-social-outline"></ion-icon> Share</button>
+                <!-- Share -->
+                <button class="btn btn-outline border border-indigo-500 text-indigo-500 my-4 hover:border-indigo-600 hover:dark:border-indigo-400" onclick={() => shareWishDialog.showModal()}><ion-icon name="share-social-outline"></ion-icon> Share</button>
+                <dialog id="shareWishDialog" class="modal">
+                    <div class="modal-box">
+                        <form method="dialog">
+                            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        </form>
+                        <ShareWishlist listId={selectedList.uuid}/>
+                    </div>
+                </dialog>
                 {#if data.user.id == selectedList.user_id}
-                    <button class="hover:text-indigo-500" onclick={() => updateList = true } ><ion-icon name="create-outline"></ion-icon> Update</button>
-                    <button class="hover:text-indigo-500" onclick={() => deleteList = true }><ion-icon name="trash-bin-outline"></ion-icon> Delete</button>
+                    <!-- Update -->
+                    <button class="btn btn-outline border border-indigo-500 text-indigo-500 my-4 hover:border-indigo-600 hover:dark:border-indigo-400" onclick={() => updateWishlistDialog.showModal()}><ion-icon name="create-outline"></ion-icon> Update</button>
+                    <dialog id="updateWishlistDialog" class="modal">
+                        <div class="modal-box">
+                            <form method="dialog">
+                                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                            </form>
+                            <UpdateWishlist listId={selectedList.uuid} listName={selectedList.name} listDescription={selectedList.description}/>
+                        </div>
+                    </dialog>
+                    <!-- Delete -->
+                    <button class="btn btn-outline border border-indigo-500 text-indigo-500 my-4 hover:border-indigo-600 hover:dark:border-indigo-400" onclick={() => deleteWishlistDialog.showModal()}><ion-icon name="trash-bin-outline"></ion-icon> Delete</button>
+                    <dialog id="deleteWishlistDialog" class="modal">
+                        <div class="modal-box">
+                            <form method="dialog">
+                                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                            </form>
+                            <DeleteWishlist listId={selectedList.uuid} listName={selectedList.name} bind:selectedList={selectedList}/>
+                        </div>
+                    </dialog>
+                    <!--<button class="hover:text-indigo-500" onclick={() => updateList = true } ><ion-icon name="create-outline"></ion-icon> Update</button>
+                    <button class="hover:text-indigo-500" onclick={() => deleteList = true }><ion-icon name="trash-bin-outline"></ion-icon> Delete</button>-->
                 {/if}
             </div>
         {/if}
@@ -198,7 +267,7 @@
             <div class="w-full text-center mx-auto mt-12">
                 <h3 class="font-black text-xl text-gray-400 dark:text-gray-600">No Wishlists 😢</h3>
                 <p>You don't have a wishlist yet, create a new one or join an existing one!</p>
-                <button onclick={() => createList = true } class="px-6 py-2 mx-auto my-4 font-semibold text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded border-4 border-indigo-500 hover:border-indigo-600">Create Wishlist</button>
+                <button onclick={() => {createWishlistDialog.showModal();}} class="px-6 py-2 mx-auto my-4 font-semibold text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded border-4 border-indigo-500 hover:border-indigo-600">Create Wishlist</button>
             </div>
         {/if}
     <!--{:catch error}
@@ -206,253 +275,6 @@
     {/await}-->
     {/if}
 
-    {#if createList }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
-            <div class="flex justify-between">
-                <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
-                    📋 New Wishlist
-                </h2>
-                <button type="button" onclick={() => createList = false } style="top: -4px;" class="relative pb-2 font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">𝘅</button>
-            </div>
-            
-            <form method="POST" action="/wishlists?/createList" use:enhance={() => {
-                loading = true;
-                return async ({ update }) => {
-                    await update();
-                    createList = false;
-                    loading = false;
-                }
-            }}>
-                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Create a new wishlist. You can share it with others or just create one for yourself.</p>
-                <TextInput title="Wishlist" id="wishlist" placeholder=""></TextInput>
-                <TextInput title="Description" id="description"></TextInput>
-                
-                <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    {#if loading}
-                        <CircularProgress/>
-                    {:else}
-                        <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Create</button>
-                    {/if}
-                </div>
-            </form>
-            <div class="my-2 flex items-center gap-4 before:h-px before:flex-1 before:bg-gray-300  before:content-[''] after:h-px after:flex-1 after:bg-gray-300  after:content-['']">Or</div>
-            <form method="POST" action="/wishlists?/joinList" use:enhance>
-                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light mb-2">Join an existing wishlist.</p>
-                <div class="flex gap-3 sm:flex-row">
-                    <TextInput title="Wishlist ID" id="sharedWishlist" placeholder=""></TextInput>
-                    <button class="px-6 py-2 mt-6 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Join</button>
-                </div>
-            </form>
-        </div>
-    {:else if updateList && selectedList}
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
-            <div class="flex justify-between">
-                <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
-                    📋 Update Wishlist
-                </h2>
-                <button type="button" onclick={() => updateList = false } style="top: -4px;" class="relative pb-2 font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">𝘅</button>
-            </div>
-            
-            <form method="POST" action="/wishlists?/updateList" use:enhance={() => {
-                loading = true;
-                return async ({ update }) => {
-                    await update();
-                    updateList = false;
-                    loading = false;
-                }
-            }}>
-                <TextInput title="Wishlist" id="wishlist" placeholder="" value={selectedList.name}></TextInput>
-                <TextInput title="Description" id="description" value={selectedList.description}></TextInput>
-                <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
-                <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    {#if loading}
-                        <CircularProgress/>
-                    {:else}
-                        <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Update</button>
-                    {/if}
-                </div>
-            </form>
-        </div>
-    {:else if deleteList && selectedList }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
-            <div class="flex justify-between">
-                <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
-                    📋 Delete Wishlist
-                </h2>
-                <button type="button" onclick={() => deleteList = false } style="top: -4px;" class="relative pb-2 font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">𝘅</button>
-            </div>
-            
-            <form method="POST" action="/wishlists?/deleteList" use:enhance={() => {
-                loading = true;
-                return async ({ update }) => {
-                    await update();
-                    deleteList = false;
-                    loading = false;
-                    selectedList = null;
-                }
-            }}>
-                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wishlist <b>{selectedList.name}</b>? This can't be undone.</p>
-                <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
-                <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    {#if loading}
-                        <CircularProgress/>
-                    {:else}
-                        <button class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50">Delete</button>
-                    {/if}
-                </div>
-            </form>
-        </div>
-    {:else if shareList && selectedList }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
-            <div class="flex justify-between">
-                <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
-                    📋 Share Wishlist
-                </h2>
-                <button type="button" onclick={() => { shareList = false; valueCopied = false; } } style="top: -4px;" class="relative pb-2 font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">𝘅</button>
-            </div>
-            
-            <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Click on the code below to copy it and send it to anyone you would like to share this list with.</p>
-            <button class="cursor-copy" onclick={() => copyListId() }>
-                <code>
-                    {selectedList.uuid}
-                </code>
-            </button>
-            {#if valueCopied}
-                <p class="flex-1 text-sm text-lime-600 dark:text-lime-400 font-light">Copied to clipboard</p>
-            {/if}
-
-        </div>
-    {:else if createWish && selectedList }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-gray-50 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
-            <div class="flex justify-between">
-                <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
-                    🎁 New Wish
-                </h2>
-                <button type="button" onclick={() => createWish = false } style="top: -4px;" class="relative pb-2 font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">𝘅</button>
-            </div>
-            <form method="POST" action="?/createWish" use:enhance={() => {
-                loading = true;
-                return async ({ update }) => {
-                    await update();
-                    createWish = false;
-                    loading = false; 
-                }
-            }}>
-                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">You can create a new wish for yourself or someone else, the wish will be added to the "{selectedList.name}" list.</p>
-                <TextInput title="Wish" id="wish" disabled={loading}></TextInput>
-                <TextInput title="For" id="wishowner" disabled={loading} value={data.user.name}></TextInput>
-                <fieldset class="w-full space-y-1 text-slate-700 dark:text-slate-400">
-                    <label for="price" class="block text-sm font-medium">Estimated price</label>
-                    <div class="flex">
-                        <input type="text" name="price" id="price" placeholder="25,00" disabled={loading} class="peer flex flex-1 text-right focus:outline-none focus:border-indigo-400 sm:text-sm rounded-l-md focus:ring-0 border-gray-700 bg-zinc-50 dark:bg-zinc-800 ">
-                        <span class="flex items-center px-3 pointer-events-none sm:text-sm rounded-r-md border border-gray-700 peer-focus:bg-indigo-400 peer-focus:dark:bg-indigo-600">€</span>
-                    </div>
-                </fieldset>
-                <TextInput title="Description" id="wishdescription" disabled={loading}></TextInput>
-                <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
-                <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    {#if loading}
-                        <CircularProgress/>
-                    {:else}
-                        <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">Create</button>
-                    {/if}
-                </div>
-            </form>
-        </div>
-    {:else if updateWish && selectedList && selectedWish}
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
-            <div class="flex justify-between">
-                <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
-                    🎁 Update Wish
-                </h2>
-                <button type="button" onclick={() => updateWish = false } style="top: -4px;" class="relative pb-2 font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">𝘅</button>
-            </div>
-            <form method="POST" action="?/updateWish" use:enhance={() => {
-                loading = true;
-                return async ({ update }) => {
-                    await update();
-                    updateWish = false;
-                    loading = false;
-                }
-            }}>
-                <TextInput title="Wish" id="wish" value={selectedWish.name} ></TextInput>
-                <TextInput title="For" id="wishowner" value={selectedWish.recipient} ></TextInput>
-                <fieldset class="w-full space-y-1 text-slate-700 dark:text-slate-400">
-                    <label for="price" class="block text-sm font-medium">Estimated price</label>
-                    <div class="flex">
-                        <input type="text" name="price" id="price" placeholder="25,00" value={selectedWish.price} class="peer flex flex-1 text-right focus:outline-none focus:border-indigo-400 sm:text-sm rounded-l-md focus:ring-0 border-gray-700 bg-zinc-50 dark:bg-zinc-800 ">
-                        <span class="flex items-center px-3 pointer-events-none sm:text-sm rounded-r-md border border-gray-700 peer-focus:bg-indigo-400 peer-focus:dark:bg-indigo-600">€</span>
-                    </div>
-                </fieldset>
-                <TextInput title="Description" id="wishdescription" value={selectedWish.description}></TextInput>
-                <input type="hidden" id="wishId" name="wishId" value={selectedWish.id}>
-                <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    {#if loading}
-                        <CircularProgress/>
-                    {:else}
-                        <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">Update</button>
-                    {/if}
-                </div>
-            </form>
-        </div>
-    {:else if reserveWish && selectedList && selectedWish }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
-            <div class="flex justify-between">
-                <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
-                    🎁 Reserve Wish
-                </h2>
-                <button type="button" onclick={() => reserveWish = false } style="top: -4px;" class="relative pb-2 font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">𝘅</button>
-            </div>
-            
-            <form method="POST" action="?/reserveWish"  use:enhance={() => {
-                loading = true;
-                return async ({ update }) => {
-                    await update();
-                    reserveWish = false;
-                    loading = false;
-                }
-            }}>
-                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Do you want to reserve the wish <b>{selectedWish.name}</b>? This will indicate to everyone else that you will get this wish.</p>
-                <input type="hidden" id="reserve" name="reserve" value=true>
-                <input type="hidden" id="wishId" name="wishId" value={selectedWish.id}>
-                <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    {#if loading}
-                        <CircularProgress/>
-                    {:else}
-                        <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">I will get it!</button>
-                    {/if}
-                </div>
-            </form>
-        </div>
-    {:else if deleteWish && selectedList && selectedWish}
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
-            <div class="flex justify-between">
-                <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
-                    🎁 Delete Wish
-                </h2>
-                <button type="button" onclick={() => deleteWish = false } style="top: -4px;" class="relative pb-2 font-semibold text-xl text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded">𝘅</button>
-            </div>
-            
-            <form method="POST" action="?/deleteWish"  use:enhance={() => {
-                loading = true;
-                return async ({ update }) => {
-                    await update();
-                    deleteWish = false;
-                    loading = false;
-                }
-            }}>
-                <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wish <b>{selectedWish.name}</b>? This can't be undone.</p>
-                <input type="hidden" id="wishId" name="wishId" value={selectedWish.id}>
-                <div class="flex flex-col justify-end gap-3 mt-6 sm:flex-row">
-                    {#if loading}
-                        <CircularProgress/>
-                    {:else}
-                        <button disabled={loading} class="px-6 py-2 rounded-sm shadow-sm dark:bg-indigo-600 dark:text-gray-50 disabled:bg-indigo-300/50">Delete</button>
-                    {/if}
-                </div>
-            </form>
-        </div>
-    {/if}
 
     {#if form != null && !form?.success}
         <p>Error creating new list!</p>

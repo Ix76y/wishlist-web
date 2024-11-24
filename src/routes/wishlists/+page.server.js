@@ -1,6 +1,9 @@
 import { error } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 
+let BASE = "https://wishlist-api-sage.vercel.app"; // 'http://127.0.0.1:8000'; // 
+
+
 async function getWishlists(token) {
     const headers = new Headers();
 	headers.append("Access-Control-Allow-Origin", "https://wishlist-api-sage.vercel.app");
@@ -236,7 +239,7 @@ export const actions = {
 		const description = data.get('wishdescription');
 
         const headers = new Headers();
-        headers.append("Access-Control-Allow-Origin", "https://wishlist-api-sage.vercel.app");
+        headers.append("Access-Control-Allow-Origin", BASE);
         headers.append("Authorization", "Bearer " + token);
         headers.append("Content-Type", "application/json");
 
@@ -246,6 +249,7 @@ export const actions = {
             recipient: recipient,
             price: price == "" ? null : parseFloat(price.replaceAll(",", ".")),
         });
+        console.log(`Server: Create Wish data: ${raw} in List: ${listId}`);
     
         const requestOptions = {
             method: "POST",
@@ -257,7 +261,7 @@ export const actions = {
 
 		var r = null;
         console.log(`Server: Creating a wish`);
-        const response = await fetch(`https://wishlist-api-sage.vercel.app/lists/${listId}/wish`, requestOptions) // https://wishlist-api-sage.vercel.app/token
+        const response = await fetch(`${BASE}/lists/${listId}/wish`, requestOptions) // https://wishlist-api-sage.vercel.app/token
             .then((response) => response.json())
             .then((result) => r = result)
             .catch((err) => {console.error(err); return { success: false, error: err } });
@@ -283,7 +287,7 @@ export const actions = {
 		const description = data.get('wishdescription');
 
         const headers = new Headers();
-        headers.append("Access-Control-Allow-Origin", "https://wishlist-api-sage.vercel.app");
+        headers.append("Access-Control-Allow-Origin", BASE);
         headers.append("Authorization", "Bearer " + token);
         headers.append("Content-Type", "application/json");
 
@@ -304,7 +308,7 @@ export const actions = {
 
 		var r = null;
         console.log(`Server: Updating Wish`);
-        const response = await fetch(`https://wishlist-api-sage.vercel.app/wishes/${wishId}`, requestOptions) // https://wishlist-api-sage.vercel.app/token
+        const response = await fetch(`${BASE}/wishes/${wishId}`, requestOptions) // https://wishlist-api-sage.vercel.app/token
             .then((response) => response.json())
             .then((result) => r = result)
             .catch((err) => {console.error(err); return { success: false, error: err } });
@@ -360,7 +364,7 @@ export const actions = {
         const wishId = data.get('wishId');
 
         const headers = new Headers();
-        headers.append("Access-Control-Allow-Origin", "https://wishlist-api-sage.vercel.app");
+        headers.append("Access-Control-Allow-Origin", BASE);
         headers.append("Authorization", "Bearer " + token);
         headers.append("Content-Type", "application/json");
     
@@ -373,7 +377,7 @@ export const actions = {
 
 		var r = null;
         console.log(`Server: Deleting Wish ${wishId}`);
-        const response = await fetch(`https://wishlist-api-sage.vercel.app/wishes/${wishId}`, requestOptions) // https://wishlist-api-sage.vercel.app/token
+        const response = await fetch(`${BASE}/wishes/${wishId}`, requestOptions) // https://wishlist-api-sage.vercel.app/token
             .then((response) => response.json())
             .then((result) => r = result)
             .catch((err) => {console.error(err); return { success: false, error: err } });

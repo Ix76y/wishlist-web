@@ -16,7 +16,7 @@
 		<a href="/user/login" class="hover:text-indigo-500 font-light">Login</a>
 	{:else }
 		<div class="flex gap-4">
-			<p class="font-light italic">Welcome, {data.user.name}</p>
+			<p class="font-light italic">Hello, {data.user.name}</p>
 			<div class="hover:text-indigo-500 font-light">
 				<form method="POST" action="/user/logout?/logoutUser">
 					<button >Logout</button>
