@@ -25,8 +25,20 @@
     let selectedWish = $state();
     var loading = $state(false);
 
-    function updateSelected(wishlists) {
+    /*function updateSelected(wishlists) {
         selectedList = wishlists.find((l) => l.uuid == $page.params.listId);
+    }*/
+
+    function isApproved() {
+        if (selectedList == null) {
+            return true;
+        }
+        for (var u of selectedList.shared_users) {
+            if (u.id == data.user.id) {
+                return u.approved;
+            }
+        }
+        return true;
     }
 
     function copyListId() {
@@ -89,37 +101,49 @@
             {#if selectedList && wishlist.uuid == selectedList.uuid}
                 <div class="flex gap-2 justify-center mt-1 italic text-sm text-slate-700 dark:text-slate-400 font-light">
                     {#if wishlist.description}
-                        <p>📝 {wishlist.description}</p>
+                        <p><ion-icon name="document-text-outline"></ion-icon> {wishlist.description}</p>
                     {/if}
                     {#if wishlist.due}
-                        <p>⏰ {new Date(wishlist.due).toDateString()}</p>
+                        <p><ion-icon name="calendar-outline"></ion-icon> {new Date(wishlist.due).toDateString()}</p>
                     {/if}
                     {#if wishlist.shared_users.length > 0 }
                         <div class="flex gap-2">
-                            <p>🧍‍♂️ Shared with: </p>
+                            <p><ion-icon name="people-outline"></ion-icon> Shared with: </p>
                             {#each wishlist.shared_users as user }
                                 {#if user.approved }
-                                    <p class="">{user.name}</p>
+                                    {#if user.id == data.user.id}
+                                        <p class="">Me</p>
+                                    {:else }
+                                        <p class="">{user.name}</p>
+                                    {/if}
                                 {:else}
-                                    <form method="POST" action="?/approveUser">
-                                        <div class="flex text-amber-600 dark:text-amber-500">
-                                            <p class="">{user.name} {user.id}</p>
-                                            <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
-                                            <input type="hidden" id="userId" name="userId" value={user.id}>
-                                            <button class="text-lime-500">✔</button>
-                                        </div>
-                                    </form>
+                                    {#if user.id == data.user.id}
+                                        <p class="">Me (Pending Approval)</p>
+                                    {:else}
+                                        <form method="POST" action="?/approveUser">
+                                            <div class="flex text-amber-600 dark:text-amber-500">
+                                                <p class="">{user.name}</p>
+                                                <input type="hidden" id="listId" name="listId" value={selectedList.uuid}>
+                                                <input type="hidden" id="userId" name="userId" value={user.id}>
+                                                <button class="text-lime-500">✔</button>
+                                            </div>
+                                        </form>
+                                    {/if}
                                 {/if}
                             {/each}
                         </div>
                     {/if}
                 </div>
-                <div class="flex items-center w-full">
-                    <button type="button" onclick={() => createWish = true } class="px-6 py-2 mx-auto my-4 font-semibold text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded border-4 border-indigo-500 hover:border-indigo-600">Add Wish</button>
-                </div>
+                {#if isApproved()}
+                    <div class="flex items-center w-full">
+                        <button type="button" onclick={() => createWish = true } class="px-6 py-2 mx-auto my-4 font-semibold text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded border-4 border-indigo-500 hover:border-indigo-600">Add Wish</button>
+                    </div>
+                {/if}
             {/if}
             {#if selectedList && wishlist.uuid == selectedList.uuid}
-                {#if wishlist.items.length == 0}
+                {#if !isApproved()}
+                <p class="italic text-sm text-slate-700 dark:text-slate-400 font-light text-center w-full my-4">The owner of the wishlist first has to approve you, before you can see items.</p>
+                {:else if wishlist.items.length == 0}
                     <p class="italic text-sm text-slate-700 dark:text-slate-400 font-light text-center w-full my-4">This wishlist is currently empty. Get started by adding a new wish to it!</p>
                 {:else}
                     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
@@ -157,8 +181,8 @@
                 {/if}
             {/if}
         {/each}
-                    
-        {#if selectedList }
+        
+        {#if selectedList && isApproved() }
             <div class="flex gap-4 justify-center mt-4">
                 <button class="hover:text-indigo-500" onclick={() => shareList = true } ><ion-icon name="share-social-outline"></ion-icon> Share</button>
                 <button class="hover:text-indigo-500" onclick={() => updateList = true } ><ion-icon name="create-outline"></ion-icon> Update</button>
