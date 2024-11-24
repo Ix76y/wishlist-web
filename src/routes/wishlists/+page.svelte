@@ -113,6 +113,8 @@
                                 {#if user.approved }
                                     {#if user.id == data.user.id}
                                         <p class="">Me</p>
+                                    {:else if user.id == wishlist.user_id }
+                                        <p class="">{user.name} (Owner)</p>
                                     {:else }
                                         <p class="">{user.name}</p>
                                     {/if}
@@ -181,7 +183,7 @@
                 {/if}
             {/if}
         {/each}
-        
+
         {#if selectedList && isApproved() }
             <div class="flex gap-4 justify-center mt-4">
                 <button class="hover:text-indigo-500" onclick={() => shareList = true } ><ion-icon name="share-social-outline"></ion-icon> Share</button>
