@@ -33,8 +33,8 @@
         if (selectedList == null) {
             return true;
         }
-        for (var u of selectedList.shared_users) {
-            if (u.id == data.user.id) {
+        for (var u of data.shared) {
+            if (u.wishlist_id == selectedList.uuid && u.user_id == data.user.id) {
                 return u.approved;
             }
         }
@@ -187,8 +187,10 @@
         {#if selectedList && isApproved() }
             <div class="flex gap-4 justify-center mt-4">
                 <button class="hover:text-indigo-500" onclick={() => shareList = true } ><ion-icon name="share-social-outline"></ion-icon> Share</button>
-                <button class="hover:text-indigo-500" onclick={() => updateList = true } ><ion-icon name="create-outline"></ion-icon> Update</button>
-                <button class="hover:text-indigo-500" onclick={() => deleteList = true }><ion-icon name="trash-bin-outline"></ion-icon> Delete</button>
+                {#if data.user.id == selectedList.user_id}
+                    <button class="hover:text-indigo-500" onclick={() => updateList = true } ><ion-icon name="create-outline"></ion-icon> Update</button>
+                    <button class="hover:text-indigo-500" onclick={() => deleteList = true }><ion-icon name="trash-bin-outline"></ion-icon> Delete</button>
+                {/if}
             </div>
         {/if}
 
