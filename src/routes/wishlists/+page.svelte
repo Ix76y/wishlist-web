@@ -165,13 +165,21 @@
                 <button onclick={() => deleteList = true }>🗑️ Delete</button>
             </div>
         {/if}
+
+        {#if data.wishlists.length == 0}
+            <div class="w-full text-center mx-auto mt-12">
+                <h3 class="font-black text-xl text-gray-400 dark:text-gray-600">No Wishlists 😢</h3>
+                <p>You don't have a wishlist yet, create a new one or join an existing one!</p>
+                <button onclick={() => createList = true } class="px-6 py-2 mx-auto my-4 font-semibold text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-600 rounded border-4 border-indigo-500 hover:border-indigo-600">Create Wishlist</button>
+            </div>
+        {/if}
     <!--{:catch error}
         <p>error loading lists: {error.message}</p>
     {/await}-->
     {/if}
 
     {#if createList }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md dark:bg-gray-50 dark:text-gray-800 mx-auto mt-8">
+        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
                     📋 New Wishlist
@@ -209,7 +217,7 @@
             </form>
         </div>
     {:else if updateList && selectedList}
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md dark:bg-gray-50 dark:text-gray-800 mx-auto mt-8">
+        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
                     📋 Update Wishlist
@@ -238,7 +246,7 @@
             </form>
         </div>
     {:else if deleteList && selectedList }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md dark:bg-gray-50 dark:text-gray-800 mx-auto mt-8">
+        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
                     📋 Delete Wishlist
@@ -252,6 +260,7 @@
                     await update();
                     deleteList = false;
                     loading = false;
+                    selectedList = null;
                 }
             }}>
                 <p class="flex-1 text-sm text-slate-700 dark:text-slate-400 font-light">Are you sure you want to delete the wishlist <b>{selectedList.name}</b>? This can't be undone.</p>
@@ -266,7 +275,7 @@
             </form>
         </div>
     {:else if shareList && selectedList }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md dark:bg-gray-50 dark:text-gray-800 mx-auto mt-8">
+        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
                     📋 Share Wishlist
@@ -286,7 +295,7 @@
 
         </div>
     {:else if createWish && selectedList }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-gray-50 dark:bg-gray-800 dark:text-gray-800 mx-auto mt-8">
+        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-gray-50 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
                     🎁 New Wish
@@ -307,7 +316,7 @@
                 <fieldset class="w-full space-y-1 text-slate-700 dark:text-slate-400">
                     <label for="price" class="block text-sm font-medium">Estimated price</label>
                     <div class="flex">
-                        <input type="text" name="price" id="price" placeholder="25,00" disabled={loading} class="peer flex flex-1 text-right focus:outline-none focus:border-indigo-400 sm:text-sm rounded-l-md focus:ring-0 border-gray-700 bg-gray-50 dark:bg-gray-800 ">
+                        <input type="text" name="price" id="price" placeholder="25,00" disabled={loading} class="peer flex flex-1 text-right focus:outline-none focus:border-indigo-400 sm:text-sm rounded-l-md focus:ring-0 border-gray-700 bg-zinc-50 dark:bg-zinc-800 ">
                         <span class="flex items-center px-3 pointer-events-none sm:text-sm rounded-r-md border border-gray-700 peer-focus:bg-indigo-400 peer-focus:dark:bg-indigo-600">€</span>
                     </div>
                 </fieldset>
@@ -323,7 +332,7 @@
             </form>
         </div>
     {:else if updateWish && selectedList && selectedWish}
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-gray-50 dark:bg-gray-800 dark:text-gray-800 mx-auto mt-8">
+        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
                     🎁 Update Wish
@@ -343,7 +352,7 @@
                 <fieldset class="w-full space-y-1 text-slate-700 dark:text-slate-400">
                     <label for="price" class="block text-sm font-medium">Estimated price</label>
                     <div class="flex">
-                        <input type="text" name="price" id="price" placeholder="25,00" value={selectedWish.price} class="peer flex flex-1 text-right focus:outline-none focus:border-indigo-400 sm:text-sm rounded-l-md focus:ring-0 border-gray-700 bg-gray-50 dark:bg-gray-800 ">
+                        <input type="text" name="price" id="price" placeholder="25,00" value={selectedWish.price} class="peer flex flex-1 text-right focus:outline-none focus:border-indigo-400 sm:text-sm rounded-l-md focus:ring-0 border-gray-700 bg-zinc-50 dark:bg-zinc-800 ">
                         <span class="flex items-center px-3 pointer-events-none sm:text-sm rounded-r-md border border-gray-700 peer-focus:bg-indigo-400 peer-focus:dark:bg-indigo-600">€</span>
                     </div>
                 </fieldset>
@@ -359,7 +368,7 @@
             </form>
         </div>
     {:else if reserveWish && selectedList && selectedWish }
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md dark:bg-gray-50 dark:text-gray-800 mx-auto mt-8">
+        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
                     🎁 Reserve Wish
@@ -388,7 +397,7 @@
             </form>
         </div>
     {:else if deleteWish && selectedList && selectedWish}
-        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md dark:bg-gray-50 dark:text-gray-800 mx-auto mt-8">
+        <div class="flex flex-col max-w-md gap-2 p-6 rounded-md shadow-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white mx-auto mt-8">
             <div class="flex justify-between">
                 <h2 class="flex items-center gap-2 text-xl font-semibold leading-tight tracking-wide text-gray-900 dark:text-gray-100">
                     🎁 Delete Wish

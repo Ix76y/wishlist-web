@@ -28,6 +28,7 @@ npm run dev -- --open
 ### Components
 
 Components from [MambaUI](https://mambaui.com/components/)
+Alternative from [DaisyUI](https://daisyui.com/)
 
 ## Building
 

@@ -1,1 +1,1 @@
-<div class="mx-auto w-16 h-16 border-4 border-dashed rounded-full animate-spin border-violet-500 dark:border-violet-600"></div>
+<div class="mx-auto w-16 h-16 border-4 border-dashed rounded-full animate-spin border-indigo-500 dark:border-indigo-600"></div>
